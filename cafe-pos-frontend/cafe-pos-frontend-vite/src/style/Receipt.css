@@ -1,0 +1,202 @@
+/* MAIN WRAPPER */
+.receipt-container {
+    background: #f0f0f0;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+}
+
+/* RECEIPT CARD */
+.receipt-card {
+    background: #ffffff;
+    width: 210mm; /* A4 width */
+    min-height: 297mm;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+/* HEADER */
+.receipt-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.business-code {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.business-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.business-address p {
+    margin: 2px 0;
+    font-size: 12px;
+}
+
+/* RECEIPT INFO */
+.receipt-info-section {
+    margin: 15px 0;
+    font-size: 13px;
+}
+
+.receipt-info-row {
+    margin-bottom: 5px;
+}
+
+/* INVOICE TITLE */
+.invoice-header {
+    text-align: center;
+    font-weight: bold;
+    margin: 15px 0;
+    text-decoration: underline;
+}
+
+/* TABLE */
+.table-container {
+    margin-top: 10px;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.items-table th,
+.items-table td {
+    border: 1px solid #ddd;
+    padding: 6px;
+}
+
+.items-table th {
+    background-color: #f9f9f9;
+    font-weight: bold;
+}
+
+.item-description {
+    width: 40%;
+}
+
+.quantity,
+.price,
+.line-total {
+    text-align: right;
+}
+
+/* DIVIDER */
+.divider {
+    border-top: 1px solid #000;
+    margin: 15px 0;
+}
+
+/* TOTALS */
+.totals-section {
+    width: 300px;
+    margin-left: auto;
+    font-size: 13px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.grand-total {
+    font-weight: bold;
+    border-top: 1px solid #000;
+    padding-top: 6px;
+}
+
+/* QR + IRN */
+.mor-certification {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.qr-image-vertical {
+    width: 320px;        /* Bigger = better scan */
+    height: 320px;
+    object-fit: contain;
+    image-rendering: pixelated; /* keeps QR sharp */
+}
+.irn-display-vertical {
+    margin-top: 10px;
+}
+
+.irn-title {
+    font-weight: bold;
+}
+
+.irn-code {
+    display: block;
+    word-break: break-all;
+    margin: 5px 0;
+}
+
+.copy-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* FOOTER */
+.receipt-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+}
+
+.timestamp {
+    margin-top: 5px;
+    font-size: 11px;
+    color: #666;
+}
+
+/* BUTTONS */
+.action-buttons {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.receipt-btn {
+    padding: 6px 14px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    font-size: 13px;
+}
+
+.receipt-btn.primary {
+    background: #000;
+    color: #fff;
+}
+
+.receipt-btn.secondary {
+    background: #ccc;
+}
+
+/* PRINT SETTINGS */
+@media print {
+    .no-print,
+    .action-buttons {
+        display: none;
+    }
+
+    .receipt-container {
+        background: white;
+        padding: 0;
+    }
+
+    .receipt-card {
+        border: none;
+        width: 100%;
+        min-height: auto;
+    }
+}

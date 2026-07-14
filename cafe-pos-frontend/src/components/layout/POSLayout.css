@@ -1,0 +1,26 @@
+.pos-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.pos-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden; /* prevents both from scrolling together */
+}
+
+.menu-area {
+  flex: 2; /* adjust width ratio: menu 2/5 */
+  background: #f9f9fb;
+  overflow-y: auto; /* independent scroll */
+  border-right: 1px solid #ddd;
+  height: 100%;
+}
+
+.order-area {
+  flex: 3; /* order 3/5 width */
+  background: #fff;
+  overflow-y: auto; /* independent scroll */
+  height: 100%;
+}

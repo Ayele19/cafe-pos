@@ -1,0 +1,52 @@
+.customer-management {
+  padding: 16px;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.buyer-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.buyer-form input {
+  flex: 1 1 150px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.buyer-form button {
+  padding: 6px 12px;
+  background-color: #1fdf85ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.buyer-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.buyer-table th,
+.buyer-table td {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.buyer-table th {
+  background-color: #f4f4f4;
+}
+
+.toast {
+  background-color: #1fdf85ff;
+  color: white;
+  padding: 6px 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}

@@ -1,0 +1,11 @@
+header nav button {
+  margin: 0 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+header nav button.active {
+  background-color: #079cf3;
+  color: white;
+  font-weight: bold;
+}

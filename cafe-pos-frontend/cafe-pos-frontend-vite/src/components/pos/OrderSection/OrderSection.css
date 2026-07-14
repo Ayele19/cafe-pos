@@ -1,0 +1,122 @@
+.order-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* full height inside parent */
+  padding: 0.5rem;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: co/* Modern OrderSection Styling */
+
+/* Main Container */
+.order-section {
+  scrollbar-width: thin;
+  scrollbar-color: #e5e7eb transparent;
+}
+
+.order-section::-webkit-scrollbar {
+  width: 6px;
+}
+
+.order-section::-webkit-scrollbar-track {
+  background: #f9fafb;
+}
+
+.order-section::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.order-section::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Modern Cards & Containers */
+.order-section > div:not(.order-section > div:first-child) {
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+/* Hover Effects */
+.order-section button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Modern Borders */
+.border-modern {
+  border: 1px solid;
+  border-image: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1)) 1;
+}
+
+/* Glass Morphism Effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Modern Shadows */
+.shadow-modern {
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.03);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Pulse Animation for Active Items */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 2s ease-in-out infinite;
+}
+
+/* Smooth Transitions */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Modern Input Focus */
+.input-modern:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Status Badge Animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.status-slide-in {
+  animation: slideIn 0.3s ease-out;
+}llapse;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.totals, .payment-details, .btn-save {
+  margin-top: 0.5rem;
+}

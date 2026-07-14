@@ -1,0 +1,56 @@
+.saved-orders {
+  padding: 20px;
+}
+
+.saved-orders h2 {
+  margin-bottom: 15px;
+}
+
+.saved-orders-table,
+.order-items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.saved-orders-table th,
+.saved-orders-table td,
+.order-items-table th,
+.order-items-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.saved-orders-table tr:nth-child(even),
+.order-items-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.saved-orders-table tr:hover,
+.order-items-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.order-summary {
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #e8f5e9;
+}
+
+.order-details td {
+  padding: 0;
+  background-color: #fefefe;
+}
+
+.order-items-table th {
+  background-color: #4caf50;
+  color: white;
+}
+
+.order-items-table td {
+  padding: 6px 8px;
+}
+
+.order-items-table tr td:first-child {
+  font-weight: bold;
+}

@@ -1,0 +1,71 @@
+/* Remove scrolling from the whole section */
+.menu-section {
+  height: 100%;
+  overflow: hidden;    /* IMPORTANT */
+  padding-right: 0;
+}
+
+/* Scroll only the items */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+
+  max-height: 70vh;    /* only this part scrolls */
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Scrollbar styling */
+.menu-grid::-webkit-scrollbar {
+  width: 6px;
+}
+.menu-grid::-webkit-scrollbar-thumb {
+  background: #b5b5b5;
+  border-radius: 4px;
+}
+.menu-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Card styling */
+/* Card styling */
+.menu-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* ensures image doesn't overflow */
+}
+
+/* Image wrapper inside card */
+.menu-card-image {
+  width: 90%;
+  height: 200px; /* adjust height as needed */
+  overflow: hidden;
+  border-bottom: 1px solid #eee; /* optional separation */
+}
+
+/* Image inside wrapper */
+.menu-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* cover the entire wrapper */
+}
+
+/* Card info */
+.menu-card-info {
+  padding: 4px; /* can reduce if needed */
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* small gap between elements */
+}
+
+.menu-card-info h4,
+.menu-card-info p{
+  margin: 0; /* remove default margins */
+  padding: 0; /* optional: remove padding if any */
+}
+
+

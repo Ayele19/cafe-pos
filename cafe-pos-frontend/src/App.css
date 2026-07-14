@@ -1,0 +1,46 @@
+/* Fixed Header */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #4803eb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.app-header h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.app-header nav button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  margin-left: 15px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.app-header nav button:hover {
+  color: #ffcc00;
+}
+
+.app-header nav .active {
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+/* Push content down to avoid being hidden behind header */
+.menu-order-container,
+.saved-orders {
+  margin-top: 70px; /* header height + spacing */
+}
