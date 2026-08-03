@@ -3,9 +3,9 @@ import Keycloak from "keycloak-js";
 
 // Initialize Keycloak instance
 const keycloak = new Keycloak({
-  url: "http://localhost:8081",   // Keycloak server
-  realm: "cafepos",               // Your realm name
-  clientId: "cafe-pos-app",       // Your client ID
+url: import.meta.env.VITE_KEYCLOAK_URL,
+  realm: import.meta.env.VITE_KEYCLOAK_REALM,
+  clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID,      // Your client ID
 });
 
 // Helper function to login
@@ -19,7 +19,7 @@ export const initKeycloak = async () => {
 
     if (!authenticated) {
       keycloak.login();            // Redirect to Keycloak login if not authenticated
-    }
+    } 
 
     return keycloak;
   } catch (err) {
