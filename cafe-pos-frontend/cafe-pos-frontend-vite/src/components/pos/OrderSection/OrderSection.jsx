@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { buyerService } from "../../../services/api";
+import { buyerService, sellerService } from "../../../services/api";
 import { orderService } from "../../../services/orderservice";
 import SellerSection from "./SellerSection";
 import BuyerSection from "./BuyerSection";
@@ -9,6 +9,7 @@ import Totals from "./Totals";
 import Payment from "./Payment";
 import ActionButtons from "./ActionButtons";
 import ToastMessage from "./ToastMessage";
+import "../../../style/OrderSection.css";
 
 // Sample sellers
 const sellersList = [
@@ -25,6 +26,25 @@ const sellersList = [
     houseNumber: "101"
   }
 ];
+
+// Walking customer — used for B2C cash sales with no registered buyer
+const WALKING_CUSTOMER = {
+  id: "walking",
+  legalName: "Walking Customer",
+  phone: "0000000000",
+  email: "isatelar437@gmail.com",
+  tin: null,
+  vatNumber: null,
+  houseNumber: "N/A",
+  city: "0",
+  region: "0",
+  zone: "N/A",
+  kebele: "N/A",
+  wereda: "N/A",
+  idNumber: "00000000000000",
+  idType: "KID",
+  country: "70"
+};
 
 // Initial empty buyer template
 const initialBuyer = {
@@ -45,8 +65,8 @@ const initialBuyer = {
   country: ""
 };
 
-function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, paymentDetails, setPaymentDetails }) {
-  const [selectedBuyer, setSelectedBuyer] = useState(null);
+function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, paymentDetails, setPaymentDetails, assignedBranch }) {
+  const [selectedBuyer, setSelectedBuyer] = useState(WALKING_CUSTOMER);
   const [buyers, setBuyers] = useState([]);
   const [showBuyerForm, setShowBuyerForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -54,25 +74,36 @@ function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, pa
   const [morResponse, setMorResponse] = useState(null);
   const [isSavingBuyer, setIsSavingBuyer] = useState(false);
   const [sellerInfo, setSellerInfo] = useState(sellersList[0] || {});
-  const [transactionType, setTransactionType] = useState("B2B");
+  const [transactionType, setTransactionType] = useState("B2C");
+
+  // When assigned branch loads, use its seller
+  useEffect(() => {
+    if (assignedBranch?.seller) {
+      setSellerInfo({
+        id: assignedBranch.seller.id,
+        legalName: assignedBranch.seller.legalName,
+        tin: assignedBranch.seller.tin,
+        vatNumber: assignedBranch.seller.vatNumber || "",
+        email: assignedBranch.seller.email || "",
+        phone: assignedBranch.seller.phone || "",
+        region: assignedBranch.seller.region || "",
+        wereda: assignedBranch.seller.wereda || "",
+        city: assignedBranch.seller.city || "",
+        houseNumber: assignedBranch.seller.houseNumber || "",
+        subCity: assignedBranch.seller.subCity || null,
+        locality: assignedBranch.seller.locality || null,
+      });
+    } else if (!assignedBranch) {
+      // Fallback: load sellers from API for admin
+      sellerService.getSellers().then(res => {
+        if (res.data?.length > 0) setSellerInfo(res.data[0]);
+      }).catch(() => {});
+    }
+  }, [assignedBranch]);
 
   const { mode: paymentMode, paymentTerm } = paymentDetails;
   const navigate = useNavigate();
 
-  // -------------------- Date Function --------------------
- const getMorDate = () => {
-  const now = new Date();
-
-  const day = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const year = now.getFullYear();
-
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-
-  return `${day}-${month}-${year}T${hours}:${minutes}:${seconds}`;
-};
   // -------------------- Toast Message --------------------
   const showMessage = useCallback((type, text) => {
     setToast({ type, text });
@@ -148,15 +179,12 @@ function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, pa
   setMorResponse(null);
 
   // -------------------- Validation --------------------
-  if (!selectedBuyer?.legalName) return showMessage("error", "Please select or add a buyer");
-  if (selectedItems.length === 0) return showMessage("error", "Please add items to the order");
+  if (!selectedBuyer?.legalName) return showMessage("error", "Please select or add a buyer");  if (selectedItems.length === 0) return showMessage("error", "Please add items to the order");
 
-  // Transaction type validation
   if (!transactionType || !["B2B", "B2C", "B2G"].includes(transactionType)) {
     return showMessage("error", "Invalid transaction type");
   }
 
-  // Buyer validation based on transaction type
   if ((transactionType === "B2B" || transactionType === "B2G") && (!selectedBuyer?.tin || !selectedBuyer?.vatNumber)) {
     return showMessage("error", "TIN and VAT Number required for B2B/B2G");
   }
@@ -164,7 +192,6 @@ function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, pa
     return showMessage("error", "Name and Phone required for B2C");
   }
 
-  // Seller validation
   const requiredSellerFields = ["legalName", "tin", "vatNumber", "region", "wereda"];
   const missingSellerField = requiredSellerFields.find(field => !sellerInfo[field]);
   if (missingSellerField) return showMessage("error", `Seller ${missingSellerField} required`);
@@ -172,22 +199,17 @@ function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, pa
   setLoading(true);
 
   try {
-    // -------------------- Fetch next invoice counter --------------------
-    const counterRes = await fetch("http://localhost:8080/api/system/invoiceCounter");
-    if (!counterRes.ok) throw new Error("Failed to fetch invoice counter");
-    const counterData = await counterRes.json();
-    const nextCounter = counterData.counter;
-
     // -------------------- Prepare ItemList --------------------
+    // Backend manages document number & invoice counter — no need to pre-fetch
     const morItems = selectedItems.map((item, index) => ({
       menuItemId: item.id,
       itemCode: item.code || `ITEM${item.id}`,
       productDescription: item.name,
       unitPrice: item.price,
-      preTaxValue: item.price * item.quantity,
+      preTaxValue: parseFloat((item.price * item.quantity).toFixed(2)),
       taxAmount: parseFloat(((item.price * item.quantity * vatRate) / 100).toFixed(2)),
       totalLineAmount: parseFloat((item.price * item.quantity * (1 + vatRate / 100)).toFixed(2)),
-      taxCode: `VAT${vatRate}`,
+      taxCode: vatRate === 15 ? "VAT15" : vatRate === 0 ? "VAT0" : vatRate === 10 ? "TOT10" : "VAT15",
       discount: 0,
       natureOfSupplies: "goods",
       exciseTaxValue: 0,
@@ -197,29 +219,57 @@ function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, pa
       lineNumber: index + 1
     }));
 
-    // -------------------- Prepare MOR Payload --------------------
+    // -------------------- Prepare Payload --------------------
+    // Field names must match OrderRequestDTO @JsonProperty annotations (PascalCase)
     const requestData = {
       TransactionType: transactionType,
       Version: "1",
-      BuyerDetails: { ...selectedBuyer, id: undefined },
-      SellerDetails: sellerInfo,
+      // Tell backend which branch to use (backend resolves from cashier record first, this is fallback for admin)
+      sourceSystemId: assignedBranch?.id || null,
+      BuyerDetails: {
+        legalName: selectedBuyer.legalName,
+        phone: selectedBuyer.phone || "",
+        email: selectedBuyer.email || "",
+        tin: selectedBuyer.tin || null,
+        vatNumber: selectedBuyer.vatNumber || null,
+        houseNumber: selectedBuyer.houseNumber || "NEW",
+        city: selectedBuyer.city || "0",
+        region: selectedBuyer.region || "0",
+        zone: selectedBuyer.zone || "",
+        kebele: selectedBuyer.kebele || "",
+        wereda: selectedBuyer.wereda || "",
+        idNumber: selectedBuyer.idNumber || null,
+        idType: selectedBuyer.idType || null,
+        country: selectedBuyer.country || "70"
+      },
+      SellerDetails: {
+        legalName: sellerInfo.legalName,
+        tin: sellerInfo.tin,
+        vatNumber: sellerInfo.vatNumber,
+        email: sellerInfo.email || "",
+        phone: sellerInfo.phone || "",
+        houseNumber: sellerInfo.houseNumber || null,
+        city: sellerInfo.city || null,
+        region: sellerInfo.region,
+        subCity: sellerInfo.subCity || null,
+        wereda: sellerInfo.wereda,
+        locality: sellerInfo.locality || null
+      },
+      // DocumentDetails: backend generates documentNumber & date — send type only
       DocumentDetails: {
-        DocumentNumber: nextCounter.toString(),
-        Date: getMorDate(),
         type: "INV"
       },
       ItemList: morItems,
-      PaymentDetails: { mode: paymentDetails.mode, paymentTerm: paymentDetails.paymentTerm },
-      ReferenceDetails: { previousIrn: "", relatedDocument: null },
-      SourceSystem: {
-        cashierName: "CurrentUser",
-        invoiceCounter: nextCounter,
-        salesPersonName: "CurrentUser",
-        systemNumber: "4249E11DD6",
-        systemType: "POS"
+      PaymentDetails: {
+        paymentMode: paymentDetails.mode,
+        paymentTerm: paymentDetails.paymentTerm
+      },
+      ReferenceDetails: {
+        previousIrn: "",
+        relatedDocument: null
       },
       ValueDetails: {
-        discount: 0,
+        discount: null,
         exciseValue: 0,
         incomeWithholdValue: 0,
         taxValue: vatAmount,
@@ -234,10 +284,17 @@ function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, pa
     const response = res.data;
     const timestamp = new Date().toLocaleString();
 
-    const irnFromResponse = response?.irn || response?.data?.irn || null;
-    const invoiceNumber = response?.DocumentNumber || response?.data?.DocumentNumber || nextCounter.toString();
+    if (response?.success === false) {
+      const errorMsg = response.message || "MOR registration failed";
+      setMorResponse({ status: "error", message: errorMsg, timestamp });
+      showMessage("error", errorMsg);
+      return;
+    }
 
-    setMorResponse({ status: "success", message: "Invoice registered", reference: irnFromResponse || invoiceNumber, timestamp });
+    const irnFromResponse = response?.irn || null;
+    const invoiceNumber = response?.documentNumber || "";
+
+    setMorResponse({ status: "success", message: "Invoice registered successfully", reference: irnFromResponse || invoiceNumber, timestamp });
     showMessage("success", `Invoice ${invoiceNumber} registered`);
 
     // -------------------- Navigate to Receipt --------------------
@@ -260,15 +317,15 @@ function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, pa
 
     // -------------------- Reset Form --------------------
     setSelectedItems([]);
-    setSelectedBuyer(buyers[0] || initialBuyer);
+    setSelectedBuyer(WALKING_CUSTOMER);
     setSellerInfo(sellersList[0] || {});
     setVatRate(15);
     setPaymentDetails({ mode: "CASH", paymentTerm: "IMMEDIATE" });
-    setTransactionType("B2B");
+    setTransactionType("B2C");
 
   } catch (err) {
     console.error("Failed to save order:", err);
-    const errorMessage = err.response?.data?.message || err.message || "Connection error";
+    const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || "Connection error";
     setMorResponse({ status: "error", message: errorMessage, timestamp: new Date().toLocaleTimeString() });
     showMessage("error", "Failed to save order");
   } finally {
@@ -283,35 +340,47 @@ function OrderSection({ selectedItems, setSelectedItems, vatRate, setVatRate, pa
   };
 
   return (
-    <div className="order-section p-4 bg-white rounded-lg shadow-md space-y-3 overflow-auto max-h-screen">
+    <div className="os">
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+
       <ToastMessage toast={toast} />
 
       {morResponse && (
-        <div className={`rounded border p-3 ${morResponse.status === "success" ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}`}>
-          <div className="flex justify-between">
-            <span className={`font-medium ${morResponse.status === "success" ? "text-green-700" : "text-red-700"}`}>
-              {morResponse.status === "success" ? "✓ Registered" : "✗ Failed"}
+        <div className={`os__banner os__banner--${morResponse.status}`}>
+          <div>
+            <span className={`os__banner-title os__banner-title--${morResponse.status}`}>
+              {morResponse.status === "success" ? "✓ Invoice Registered" : "✗ Failed"}
             </span>
-            <button onClick={() => setMorResponse(null)} className="text-gray-400 hover:text-gray-600">×</button>
+            <div className="os__banner-msg">{morResponse.message}</div>
           </div>
-          <div className="text-sm text-gray-700 mt-1">{morResponse.message}</div>
-          {morResponse.status === "error" && (
-            <button onClick={saveOrder} className="mt-2 text-sm text-blue-600 hover:text-blue-800">Try again →</button>
-          )}
+          <div className="os__banner-actions">
+            {morResponse.status === "error" && (
+              <button className="os__btn-retry" onClick={saveOrder}>Retry →</button>
+            )}
+            <button className="os__btn-close" onClick={() => setMorResponse(null)}>×</button>
+          </div>
         </div>
       )}
 
-      <SellerSection sellerInfo={sellerInfo} setSellerInfo={setSellerInfo} sellersList={sellersList} />
-      <BuyerSection
-        selectedBuyer={selectedBuyer}
-        setSelectedBuyer={setSelectedBuyer}
-        buyers={buyers}
-        showBuyerForm={showBuyerForm}
-        setShowBuyerForm={setShowBuyerForm}
-        saveBuyer={saveBuyer}
-        isSavingBuyer={isSavingBuyer}
-        initialBuyer={initialBuyer}
-      />
+      <div className="os__row">
+        <SellerSection sellerInfo={sellerInfo} setSellerInfo={setSellerInfo} sellersList={sellersList} />
+      </div>
+      <div className="os__row">
+        <BuyerSection
+          selectedBuyer={selectedBuyer}
+          setSelectedBuyer={setSelectedBuyer}
+          buyers={buyers}
+          showBuyerForm={showBuyerForm}
+          setShowBuyerForm={setShowBuyerForm}
+          saveBuyer={saveBuyer}
+          isSavingBuyer={isSavingBuyer}
+          initialBuyer={initialBuyer}
+          walkingCustomer={WALKING_CUSTOMER}
+          setTransactionType={setTransactionType}
+          transactionType={transactionType}
+        />
+      </div>
+
       <OrderList selectedItems={selectedItems} adjustQuantity={adjustQuantity} />
       <Totals subtotal={subtotal} vatAmount={vatAmount} totalPrice={totalPrice} vatRate={vatRate} />
       <Payment

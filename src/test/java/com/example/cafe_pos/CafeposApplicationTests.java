@@ -3,7 +3,7 @@ package com.example.cafe_pos;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes = CafeposApplication.class)
 class CafeposApplicationTests {
 
     @Test

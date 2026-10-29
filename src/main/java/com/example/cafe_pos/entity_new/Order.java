@@ -22,7 +22,7 @@ public class Order {
     @JoinColumn(name = "seller_id", nullable = false)
     private SellerInfo sellerInfo;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "buyer_id")
     private BuyerInfo buyerInfo;
 

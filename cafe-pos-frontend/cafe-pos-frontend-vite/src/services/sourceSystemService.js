@@ -1,11 +1,9 @@
-import axios from "axios";
-
-const BASE_URL = "http://localhost:8080/api/source-system";
+import api from "./api";
 
 export const sourceSystemService = {
-  getAll: async () => axios.get(`${BASE_URL}/all`),
-  getById: async (id) => axios.get(`${BASE_URL}/${id}`),
-  create: async (data) => axios.post(`${BASE_URL}/add`, data),
-  update: async (id, data) => axios.put(`${BASE_URL}/update/${id}`, data),
-  delete: async (id) => axios.delete(`${BASE_URL}/delete/${id}`)
+  getAll: async () => api.get("/source-system/all"),
+  getById: async (id) => api.get(`/source-system/${id}`),
+  create: async (data) => api.post("/source-system/add", data),
+  update: async (id, data) => api.put(`/source-system/update/${id}`, data),
+  delete: async (id) => api.delete(`/source-system/delete/${id}`),
 };

@@ -14,143 +14,153 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Communicates with MOR HTTPS API.
+ * Every request is signed with SHA512withRSA via MorSigningService.
+ *
+ * Request envelope:
+ * {
+ *   "request": { ...actual payload... },
+ *   "signature": "<base64 SHA512withRSA signature of JSON(request)>",
+ *   "certificate": "<base64 certificate>"
+ * }
+ */
 @Service
 public class TaxApiService {
 
-    @Value("${taxapi.clientId}") private String clientId;
+    @Value("${taxapi.clientId}")    private String clientId;
     @Value("${taxapi.clientSecret}") private String clientSecret;
-    @Value("${taxapi.apiKey}") private String apiKey;
-    @Value("${taxapi.taxpayerTin}") private String taxpayerTin;
-    @Value("${tax.api.authUrl}") private String authUrl;
-    @Value("${tax.api.url}") private String apiUrl;
+    @Value("${taxapi.apiKey}")       private String apiKey;
+    @Value("${taxapi.taxpayerTin}")  private String taxpayerTin;
+    @Value("${tax.api.authUrl}")     private String authUrl;
+    @Value("${tax.api.url}")         private String apiUrl;
     @Value("${tax.api.refreshTokenUrl}") private String refreshTokenUrl;
 
-    @Autowired
-    private TaxApiTokenRepository tokenRepository;
+    @Autowired private TaxApiTokenRepository tokenRepository;
+    @Autowired private MorSigningService signingService;
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private String accessToken;
     private String refreshToken;
-    private Instant tokenExpiry;
 
-    // -------------------- Load token from DB --------------------
+    // ── Token persistence ──
     private void loadTokenFromDB() {
-        tokenRepository.findAll().stream().findFirst().ifPresent(token -> {
-            this.accessToken = token.getAccessToken();
-            this.refreshToken = token.getRefreshToken();
+        tokenRepository.findAll().stream().findFirst().ifPresent(t -> {
+            this.accessToken  = t.getAccessToken();
+            this.refreshToken = t.getRefreshToken();
         });
     }
 
-    // -------------------- Save token to DB --------------------
-    private void saveTokenToDB(String accessToken, String refreshToken) {
+    private void saveTokenToDB(String access, String refresh) {
         TaxApiToken token = tokenRepository.findAll().stream().findFirst().orElse(new TaxApiToken());
-        token.setAccessToken(accessToken);
-        token.setRefreshToken(refreshToken);
+        token.setAccessToken(access);
+        token.setRefreshToken(refresh);
         tokenRepository.save(token);
     }
 
-    // -------------------- Authenticate / Login --------------------
+    // ── Authentication ──
     public void authenticate() {
+        AuthRequestDTO authRequest = new AuthRequestDTO(clientId, clientSecret, apiKey, taxpayerTin);
+
+        // Sign the auth request payload
+        Map<String, Object> envelope = signingService.buildSignedRequest(authRequest);
+
+        org.slf4j.LoggerFactory.getLogger(TaxApiService.class)
+            .info("Auth envelope signature field: {}",
+                envelope.get("signature") != null ? "present (" + envelope.get("signature").toString().length() + " chars)" : "NULL/MISSING");
+        org.slf4j.LoggerFactory.getLogger(TaxApiService.class)
+            .info("Auth envelope certificate field: {}",
+                envelope.get("certificate") != null ? "present (" + envelope.get("certificate").toString().length() + " chars)" : "NULL/MISSING");
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
-        AuthRequestDTO authRequest = new AuthRequestDTO(clientId, clientSecret, apiKey, taxpayerTin);
-        HttpEntity<AuthRequestDTO> request = new HttpEntity<>(authRequest, headers);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(envelope, headers);
 
         ResponseEntity<AuthResponseDTO> response = restTemplate.postForEntity(authUrl, request, AuthResponseDTO.class);
 
         if (response.getStatusCode() == HttpStatus.OK
                 && response.getBody() != null
                 && "SUCCESS".equals(response.getBody().getStatus())) {
-
-            this.accessToken = response.getBody().getData().getAccessToken();
+            this.accessToken  = response.getBody().getData().getAccessToken();
             this.refreshToken = response.getBody().getData().getRefreshToken();
             saveTokenToDB(accessToken, refreshToken);
-
         } else {
-            throw new RuntimeException("Failed to authenticate with Tax API");
+            throw new RuntimeException("Failed to authenticate with MOR API");
         }
     }
 
-    // -------------------- Refresh Access Token --------------------
+    // ── Refresh token ──
     public void refreshAccessToken() {
         if (refreshToken == null) loadTokenFromDB();
-        if (refreshToken == null) {
-            System.out.println("⚠️ No refresh token found, re-authenticating...");
+        if (refreshToken == null || refreshToken.isBlank()) {
+            // No refresh token available — re-authenticate from scratch
             authenticate();
             return;
         }
 
+        Map<String, String> body = Map.of("refreshToken", refreshToken);
+        Map<String, Object> envelope = signingService.buildSignedRequest(body);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, String> body = new HashMap<>();
-        body.put("refreshToken", refreshToken);
-
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(envelope, headers);
 
         try {
             ResponseEntity<AuthResponseDTO> response = restTemplate.postForEntity(refreshTokenUrl, request, AuthResponseDTO.class);
-
             if (response.getStatusCode() == HttpStatus.OK
                     && response.getBody() != null
                     && "SUCCESS".equals(response.getBody().getStatus())) {
-
-                this.accessToken = response.getBody().getData().getAccessToken();
+                this.accessToken  = response.getBody().getData().getAccessToken();
                 this.refreshToken = response.getBody().getData().getRefreshToken();
                 saveTokenToDB(accessToken, refreshToken);
-
             } else {
-                System.out.println("⚠️ Refresh token invalid, re-authenticating...");
+                // Refresh failed — re-authenticate
                 authenticate();
             }
-
         } catch (HttpClientErrorException.Unauthorized e) {
-            System.out.println("⚠️ Refresh token unauthorized, re-authenticating...");
+            authenticate();
+        } catch (HttpClientErrorException e) {
+            // Any 4xx on refresh (including null refreshToken) — re-authenticate
             authenticate();
         }
     }
 
-    // -------------------- Send Invoice --------------------
-    public String sendInvoice(ExternalInvoiceDTO externalDTO) throws JsonProcessingException {
+    // ── Send invoice ──
+    public String sendInvoice(ExternalInvoiceDTO dto) throws JsonProcessingException {
         if (accessToken == null) loadTokenFromDB();
         if (accessToken == null) authenticate();
-
-        return sendInvoiceRequest(externalDTO);
+        return sendInvoiceRequest(dto);
     }
 
-    // -------------------- Send Invoice Request --------------------
     private String sendInvoiceRequest(ExternalInvoiceDTO dto) throws JsonProcessingException {
-        String invoiceJson = objectMapper.writeValueAsString(dto);
+        // Sign the invoice payload
+        Map<String, Object> envelope = signingService.buildSignedRequest(dto);
+        String envelopeJson = objectMapper.writeValueAsString(envelope);
+
+        // Log what we're actually sending
+        org.slf4j.LoggerFactory.getLogger(TaxApiService.class)
+            .info("Sending to MOR register. Envelope signature field: {}",
+                envelope.get("signature") != null ? "present (" + envelope.get("signature").toString().length() + " chars)" : "NULL/MISSING");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(accessToken); // ✅ add token header
-
-        HttpEntity<String> request = new HttpEntity<>(invoiceJson, headers);
-        ResponseEntity<String> response;
+        headers.setBearerAuth(accessToken);
+        HttpEntity<String> request = new HttpEntity<>(envelopeJson, headers);
 
         try {
-            response = restTemplate.postForEntity(apiUrl, request, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
+            if (response.getStatusCode() == HttpStatus.OK) return response.getBody();
+            throw new RuntimeException("Invoice registration failed: " + response.getStatusCode());
         } catch (HttpClientErrorException.Unauthorized e) {
-            // Token might be expired → refresh or re-authenticate
             refreshAccessToken();
             headers.setBearerAuth(accessToken);
-            request = new HttpEntity<>(invoiceJson, headers);
-            response = restTemplate.postForEntity(apiUrl, request, String.class);
-        }
-
-        if (response.getStatusCode() == HttpStatus.OK) {
+            request = new HttpEntity<>(envelopeJson, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
             return response.getBody();
-        } else {
-            throw new RuntimeException("Invoice registration failed with status: "
-                    + response.getStatusCode() + " and body: " + response.getBody());
         }
     }
 }

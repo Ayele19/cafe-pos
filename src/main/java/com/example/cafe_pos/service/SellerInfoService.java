@@ -22,6 +22,24 @@ public class SellerInfoService {
         return mapToDTO(saved);
     }
 
+    // Update seller
+    public SellerDetailsDTO updateSeller(Long id, SellerDetailsDTO dto) {
+        SellerInfo entity = sellerInfoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Seller not found: " + id));
+        entity.setLegalName(dto.getLegalName());
+        entity.setTin(dto.getTin());
+        entity.setVatNumber(dto.getVatNumber());
+        entity.setEmail(dto.getEmail());
+        entity.setPhone(dto.getPhone());
+        entity.setCity(dto.getCity());
+        entity.setRegion(dto.getRegion());
+        entity.setWereda(dto.getWereda());
+        entity.setSubCity(dto.getSubCity());
+        entity.setHouseNumber(dto.getHouseNumber());
+        entity.setLocality(dto.getLocality());
+        return mapToDTO(sellerInfoRepository.save(entity));
+    }
+
     // Get all sellers
     public List<SellerDetailsDTO> getAllSellers() {
         return sellerInfoRepository.findAll()
@@ -50,6 +68,7 @@ public class SellerInfoService {
     // Mapper: Entity -> DTO
     private SellerDetailsDTO mapToDTO(SellerInfo entity) {
         SellerDetailsDTO dto = new SellerDetailsDTO();
+        dto.setId(entity.getId());
         dto.setTin(entity.getTin());
         dto.setLegalName(entity.getLegalName());
         dto.setEmail(entity.getEmail());

@@ -1,43 +1,23 @@
 package com.example.cafe_pos.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class SellerDetailsDTO {
 
-    @JsonProperty("Tin")
+    private Long id;
     private String tin;
-
-    @JsonProperty("LegalName")
     private String legalName;
-
-    @JsonProperty("Email")
     private String email;
-
-    @JsonProperty("Phone")
     private String phone;
-
-    @JsonProperty("VatNumber")
     private String vatNumber;
-
-    @JsonProperty("City")
     private String city;
-
-    @JsonProperty("Region")
     private String region;
-
-    @JsonProperty("Wereda")
     private String wereda;
-
-    @JsonProperty("SubCity")
     private String subCity;
-
-    @JsonProperty("HouseNumber")
     private String houseNumber;
-
-    @JsonProperty("Locality")
     private String locality;
 
-    // --- getters & setters ---
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
     public String getTin() { return tin; }
     public void setTin(String tin) { this.tin = tin; }
 

@@ -56,32 +56,35 @@ const MenuSection = ({ menuItems, setMenuItems, selectedItems, setSelectedItems 
   if (!menuItems || menuItems.length === 0) return <p>No menu items available.</p>;
 
   return (
-    <div className="menu-section scrollable">
+    <div className="menu-section">
       {message && <div className="toast">{message}</div>}
 
-      <h2>Menu Items</h2>
-
-      {/* Filter by category */}
-      <div style={{ marginBottom: "10px" }}>
-        <label htmlFor="categoryFilter" style={{ marginRight: "10px" }}>
-          Filter by Category:
-        </label>
-        <select
-          id="categoryFilter"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          style={{ padding: "5px 10px", borderRadius: "4px" }}
-        >
-          {categories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
+      {/* Filter by category — buttons side by side */}
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px", flexShrink: 0 }}>
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            style={{
+              padding: "5px 14px",
+              borderRadius: "20px",
+              border: `1.5px solid ${selectedCategory === cat ? "#1b6375" : "#d1d5db"}`,
+              background: selectedCategory === cat ? "#1b6375" : "#fff",
+              color: selectedCategory === cat ? "#fff" : "#374151",
+              fontSize: "12px",
+              fontWeight: selectedCategory === cat ? "700" : "400",
+              cursor: "pointer",
+              transition: "all 0.15s"
+            }}>
+            {cat}
+          </button>
+        ))}
       </div>
 
       {/* Menu grid */}
       <div className="menu-grid">
         {filteredItems.map(item => (
-          <div key={item.id} className="menu-card">
+          <div key={item.id} className="menu-card" onClick={() => addToOrder(item)} style={{ cursor: "pointer" }}>
             <div className="menu-card-image">
               <img
                 src={item.imageUrl ? `http://localhost:8080${item.imageUrl}?t=${new Date().getTime()}` : "/placeholder.png"}
@@ -90,10 +93,7 @@ const MenuSection = ({ menuItems, setMenuItems, selectedItems, setSelectedItems 
             </div>
             <div className="menu-card-info">
               <h4>{item.name}</h4>
-              <p>Price: {item.price.toFixed(2)} Birr</p>
-              <p>Category: {item.category}</p>
-              <p>Unit: {item.unit}</p>
-              <button onClick={() => addToOrder(item)}>Add to Order</button>
+              <p>{item.price.toFixed(2)} ETB</p>
             </div>
           </div>
         ))}

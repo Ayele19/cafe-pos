@@ -1,0 +1,137 @@
+.vi { padding: 24px; max-width: 780px; margin: 0 auto; }
+
+.vi__title     { font-size: 20px; font-weight: 700; color: #111827; margin: 0; }
+.vi__subtitle  { font-size: 13px; color: #6b7280; margin-top: 4px; }
+.vi__header    { margin-bottom: 20px; }
+
+/* Search */
+.vi__search-box {
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 16px;
+  padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px;
+}
+.vi__search-label { font-size: 12px; font-weight: 600; color: #374151; display: block; margin-bottom: 8px; }
+.vi__search-row { display: flex; gap: 10px; }
+.vi__input {
+  flex: 1; border: 1px solid #d1d5db; border-radius: 10px;
+  padding: 10px 14px; font-size: 13px; font-family: monospace; outline: none; transition: border 0.2s;
+}
+.vi__input:focus { border-color: #3b82f6; }
+.vi__btn-verify {
+  padding: 10px 22px; color: #fff; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 700; cursor: pointer; min-width: 110px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  background: linear-gradient(135deg, #1b6375, #1fdf85); transition: opacity 0.2s;
+}
+.vi__btn-verify:disabled { background: #9ca3af; cursor: not-allowed; }
+
+.vi__error {
+  margin-top: 10px; padding: 10px 14px; background: #fef2f2;
+  border: 1px solid #fca5a5; border-radius: 8px; font-size: 13px; color: #dc2626;
+}
+
+/* Status card */
+.vi__result { animation: vi-fade 0.3s ease; }
+.vi__status-card {
+  border-radius: 16px; padding: 14px 18px; margin-bottom: 16px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.vi__status-card--active  { background: linear-gradient(135deg,#f0fdf4,#dcfce7); border: 1px solid #86efac; }
+.vi__status-card--cancelled { background: linear-gradient(135deg,#fef2f2,#fee2e2); border: 1px solid #fca5a5; }
+.vi__status-label--active  { font-size: 18px; font-weight: 800; color: #16a34a; }
+.vi__status-label--cancelled { font-size: 18px; font-weight: 800; color: #dc2626; }
+.vi__status-meta { margin-top: 6px; display: flex; align-items: center; gap: 8px; }
+.vi__irn { font-size: 11px; color: #6b7280; font-family: monospace; }
+.vi__btn-copy {
+  background: none; border: none; cursor: pointer; font-size: 12px;
+  color: #9ca3af; padding: 0;
+}
+.vi__btn-copy--done { color: #16a34a; }
+.vi__tx-badge {
+  background: #fff; border: 1px solid #d1d5db; border-radius: 20px;
+  padding: 2px 10px; font-size: 11px; color: #6b7280; font-weight: 600;
+}
+.vi__status-actions { display: flex; align-items: center; gap: 12px; }
+.vi__cancelled-msg { font-size: 11px; color: #dc2626; margin-top: 4px; }
+
+/* Cancel button */
+.vi__btn-cancel-invoice {
+  padding: 8px 16px; background: #dc2626; color: #fff; border: none;
+  border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+
+/* Cancel form */
+.vi__cancel-form {
+  background: #fff; border: 1px solid #fca5a5; border-radius: 16px;
+  padding: 20px; margin-bottom: 16px; animation: vi-fade 0.2s ease;
+}
+.vi__cancel-title { font-size: 14px; font-weight: 700; color: #dc2626; margin-bottom: 14px; }
+.vi__cancel-error {
+  padding: 8px 12px; background: #fef2f2; border: 1px solid #fca5a5;
+  border-radius: 8px; font-size: 12px; color: #dc2626; margin-bottom: 12px;
+}
+.vi__cancel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.vi__field { display: flex; flex-direction: column; }
+.vi__label { font-size: 11px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+.vi__select, .vi__remark {
+  border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px;
+  font-size: 13px; outline: none; width: 100%; box-sizing: border-box;
+}
+.vi__cancel-actions { display: flex; gap: 10px; margin-top: 14px; }
+.vi__btn-back {
+  flex: 1; padding: 9px; border: 1px solid #d1d5db;
+  border-radius: 8px; background: #fff; cursor: pointer; font-size: 13px;
+}
+.vi__btn-confirm {
+  flex: 2; padding: 9px; background: #dc2626; color: #fff; border: none;
+  border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.vi__btn-confirm:disabled { background: #9ca3af; cursor: not-allowed; }
+
+/* Cancellation success */
+.vi__cancel-success {
+  padding: 12px 16px; background: #fff7ed; border: 1px solid #fed7aa;
+  border-radius: 12px; margin-bottom: 16px; font-size: 13px; color: #c2410c;
+}
+
+/* Collapsible sections */
+.vi__sections { display: flex; flex-direction: column; gap: 10px; }
+.vi__section { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+.vi__section-btn {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px; border: none; cursor: pointer; font-size: 13px;
+  font-weight: 600; color: #374151; transition: background 0.15s;
+}
+.vi__section-btn:hover { background: #f9fafb; }
+.vi__section-btn--open { background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+.vi__section-arrow { font-size: 12px; color: #9ca3af; transition: transform 0.2s; }
+.vi__section-arrow--open { transform: rotate(180deg); }
+.vi__section-body { padding: 14px 16px; }
+
+/* KV grid */
+.vi__kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+.vi__kv { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+.vi__kv-label { font-size: 12px; color: #6b7280; }
+.vi__kv-value { font-size: 13px; font-weight: 500; color: #374151; }
+.vi__kv-value--bold { font-weight: 700; color: #111827; }
+
+/* Items table */
+.vi__items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.vi__items-table th {
+  padding: 8px 12px; text-align: left; font-weight: 600; color: #374151;
+  border-bottom: 2px solid #e5e7eb; background: #f9fafb;
+}
+.vi__items-table td { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; }
+.vi__items-table tr:nth-child(even) { background: #f9fafb; }
+.vi__td-right { text-align: right; }
+.vi__td-bold  { font-weight: 600; }
+
+/* Spinner */
+.vi__spinner {
+  display: inline-block; width: 12px; height: 12px;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+  border-radius: 50%; animation: vi-spin 0.7s linear infinite;
+}
+
+@keyframes vi-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vi-spin { to { transform: rotate(360deg); } }

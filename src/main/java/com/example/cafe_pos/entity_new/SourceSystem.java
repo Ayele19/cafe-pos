@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "source_system")
+@Table(name = "source_system", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "system_number")
+})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class SourceSystem {
 
@@ -16,7 +18,7 @@ public class SourceSystem {
     private String cashierName;
 
     @Column(name = "invoice_counter")
-    private Integer invoiceCounter; // ✅ Integer allows null
+    private Integer invoiceCounter;
 
     @Column(name = "sales_person_name")
     private String salesPersonName;
@@ -26,6 +28,14 @@ public class SourceSystem {
 
     @Column(name = "system_type")
     private String systemType;
+
+    @Column(name = "branch_name")
+    private String branchName;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "seller_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private SellerInfo seller;
 
     // -----------------------------
     // Getters & Setters
@@ -78,5 +88,10 @@ public class SourceSystem {
     public void setSystemType(String systemType) {
         this.systemType = systemType;
     }
-    
+
+    public String getBranchName() { return branchName; }
+    public void setBranchName(String branchName) { this.branchName = branchName; }
+
+    public SellerInfo getSeller() { return seller; }
+    public void setSeller(SellerInfo seller) { this.seller = seller; }
 }

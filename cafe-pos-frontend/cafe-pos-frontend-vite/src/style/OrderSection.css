@@ -1,0 +1,45 @@
+.os {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: #fff;
+  position: relative;
+}
+
+/* MOR response banner */
+.os__banner {
+  margin: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.os__banner--success { background: #f0fdf4; border: 1px solid #86efac; }
+.os__banner--error   { background: #fef2f2; border: 1px solid #fca5a5; }
+
+.os__banner-title { font-size: 13px; font-weight: 700; }
+.os__banner-title--success { color: #16a34a; }
+.os__banner-title--error   { color: #dc2626; }
+
+.os__banner-msg { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+.os__banner-actions { display: flex; gap: 8px; align-items: center; }
+.os__btn-retry {
+  font-size: 11px; color: #3b82f6;
+  background: none; border: none; cursor: pointer;
+}
+.os__btn-close {
+  background: none; border: none; color: #9ca3af;
+  cursor: pointer; font-size: 16px; line-height: 1;
+}
+
+/* Row wrappers */
+.os__row {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  flex-shrink: 0;
+}
+
+@keyframes os-spin { to { transform: rotate(360deg); } }

@@ -6,15 +6,20 @@
     font-size: 13px;
     display: flex;
     justify-content: center;
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 /* RECEIPT CARD */
 .receipt-card {
     background: #ffffff;
-    width: 210mm; /* A4 width */
-    min-height: 297mm;
+    width: 210mm;
+    max-width: 100%;
+    height: fit-content;
     padding: 20px;
     border: 1px solid #ccc;
+    box-sizing: border-box;
 }
 
 /* HEADER */

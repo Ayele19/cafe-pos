@@ -1,0 +1,215 @@
+/* ── App shell ── */
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Global navbar ── */
+.app__navbar {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e5e7eb;
+  padding: 6px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 50;
+}
+
+.app__logo {
+  font-size: 15px;
+  font-weight: 800;
+  color: #111827;
+}
+
+/* Profile */
+.app__profile { position: relative; }
+
+.app__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1b6375, #1fdf85);
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(27, 99, 117, 0.3);
+}
+
+.app__dropdown {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  min-width: 200px;
+  padding: 12px;
+  z-index: 100;
+  animation: app-fade 0.15s ease;
+}
+
+.app__dropdown-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.app__dropdown-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1b6375, #1fdf85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.app__dropdown-name { font-size: 13px; font-weight: 700; color: #111827; }
+.app__dropdown-role { font-size: 11px; color: #6b7280; }
+
+.app__dropdown-divider { border-top: 1px solid #f3f4f6; padding-top: 8px; }
+
+.app__btn-logout {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.app__btn-logout:hover { background: #fee2e2; }
+
+.app__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+/* ── App body ── */
+.app__body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__receipt-wrapper {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ── Access denied ── */
+.app__denied {
+  padding: 40px;
+  text-align: center;
+}
+
+/* ── POSLayout ── */
+.pos {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Sales top nav bar */
+.pos__topnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pos__topnav-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.pos__nav-btn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-width: 1.5px;
+  border-style: solid;
+  transition: all 0.15s;
+}
+.pos__nav-btn--active {
+  border-color: #1b6375;
+  background: #1b6375;
+  color: #fff;
+  font-weight: 700;
+}
+.pos__nav-btn--idle {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+  color: #374151;
+  font-weight: 400;
+}
+
+/* Main content area */
+.pos__main { flex: 1; display: flex; overflow: hidden; }
+
+.pos__sidebar-wrapper { width: 220px; flex-shrink: 0; height: 100%; }
+
+.pos__content { flex: 1; display: flex; height: 100%; box-sizing: border-box; }
+.pos__content--sales   { flex-direction: row; overflow: hidden; }
+.pos__content--section { flex-direction: column; overflow: auto; }
+
+/* Sales layout */
+.pos__menu-area {
+  flex: 1;
+  min-width: 0;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.pos__order-area {
+  width: 35%;
+  min-width: 220px;
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+  border-left: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+/* Section wrappers */
+.pos__section { flex: 1; }
+
+@keyframes app-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

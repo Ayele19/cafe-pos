@@ -1,7 +1,9 @@
 package com.example.cafe_pos.controller;
 
+import com.example.cafe_pos.security.Permission;
 import com.example.cafe_pos.service.SourceSystemService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -16,8 +18,8 @@ public class SystemController {
         this.sourceSystemService = sourceSystemService;
     }
 
-    // ===================== GET: Read-only, show current + 1 =====================
     @GetMapping("/invoiceCounter")
+    @PreAuthorize("hasAuthority('" + Permission.SYSTEM_READ + "')")
     public ResponseEntity<Map<String, Integer>> getInvoiceCounter(
             @RequestParam(required = false) Long sourceSystemId) {
 
@@ -25,13 +27,12 @@ public class SystemController {
             sourceSystemId = 1L;
         }
 
-        // Read-only, no increment
         int currentCounter = sourceSystemService.getInvoiceCounter(sourceSystemId);
-        return ResponseEntity.ok(Map.of("counter", currentCounter ));
+        return ResponseEntity.ok(Map.of("counter", currentCounter));
     }
 
-    // ===================== POST: Increment and return next =====================
     @PostMapping("/invoiceCounter/next")
+    @PreAuthorize("hasAuthority('" + Permission.SYSTEM_WRITE + "')")
     public ResponseEntity<Map<String, Integer>> getNextInvoiceCounter(
             @RequestParam(required = false) Long sourceSystemId) {
 
@@ -39,7 +40,6 @@ public class SystemController {
             sourceSystemId = 1L;
         }
 
-        // Increment the counter in DB
         int nextCounter = sourceSystemService.incrementInvoiceCounter(sourceSystemId);
         return ResponseEntity.ok(Map.of("counter", nextCounter));
     }

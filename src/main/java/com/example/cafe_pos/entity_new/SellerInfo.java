@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "seller_info")
+@Table(name = "seller_info", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "tin")
+})
 public class SellerInfo {
 
     @Id
@@ -26,10 +28,13 @@ public class SellerInfo {
     private String locality;
     private String wereda;
 
-  
-    // -----------------------------
-    // ✅ Getters & Setters
-    // -----------------------------
+    @Column(name = "admin_username", unique = true)
+    private String adminUsername;
+
+    // Getters & Setters
+
+    public String getAdminUsername() { return adminUsername; }
+    public void setAdminUsername(String adminUsername) { this.adminUsername = adminUsername; }
 
     public Long getId() {
         return id;

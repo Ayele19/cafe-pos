@@ -1,0 +1,53 @@
+# ============================================================
+# Cafe POS - Application Configuration Template
+# Copy this file to application.properties and fill in values.
+# DO NOT commit application.properties to version control.
+# ============================================================
+
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/cafepos_db
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
+
+# JPA/Hibernate Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.properties.hibernate.format_sql=false
+spring.web.resources.static-locations=file:uploads/
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=5MB
+
+# Spring Security - OAuth2 Resource Server (Keycloak)
+spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8081/realms/cafepos
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost:8081/realms/cafepos/protocol/openid-connect/certs
+
+# RBAC default role (set empty to deny users with no CafePOS role)
+cafe.pos.rbac.default-role=cashier
+
+# Server Port
+server.port=8080
+
+# Keycloak Admin API (for user registration)
+keycloak.admin.url=http://localhost:8081
+keycloak.admin.realm=cafepos
+keycloak.admin.client-id=admin-cli
+keycloak.admin.username=${KEYCLOAK_ADMIN_USER:admin1}
+keycloak.admin.password=${KEYCLOAK_ADMIN_PASSWORD:your_admin_password}
+
+# Tax API Credentials (loaded from environment variables)
+taxapi.clientId=${TAXAPI_CLIENT_ID}
+taxapi.clientSecret=${TAXAPI_CLIENT_SECRET}
+taxapi.apiKey=${TAXAPI_API_KEY}
+taxapi.taxpayerTin=${TAXAPI_TAXPAYER_TIN}
+
+# MOR Signing - path to private key PEM file and base64-encoded certificate
+taxapi.privateKeyPath=${TAXAPI_PRIVATE_KEY_PATH:/path/to/private_key.key}
+taxapi.certificate=${TAXAPI_CERTIFICATE}
+
+# Tax API URLs
+tax.api.authUrl=https://core.mor.gov.et/auth/login
+tax.api.url=https://core.mor.gov.et/v1/register
+tax.api.refreshTokenUrl=https://core.mor.gov.et/auth/refresh-token
+tax.api.verification=https://core.mor.gov.et/v1/verify
+tax.api.cancelUrl=https://core.mor.gov.et/v1/cancel

@@ -16,7 +16,7 @@ public class FailedInvoice {
 
     // Store the full order JSON, optimized for large size
     @Lob
-    @Column(columnDefinition = "CLOB") // Works for large JSON
+    @Column(columnDefinition = "LONGTEXT") // Works for large JSON
     private String orderJson;
 
     // Store the error message returned by MOR or other failure reason

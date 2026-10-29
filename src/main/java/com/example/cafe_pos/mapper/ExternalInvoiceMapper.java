@@ -46,20 +46,24 @@ public class ExternalInvoiceMapper {
     public static ExternalBuyerDetailsDTO toExternalBuyerDetailsDTO(BuyerInfo entity) {
         ExternalBuyerDetailsDTO dto = new ExternalBuyerDetailsDTO();
         dto.setLegalName(entity.getLegalName());
-        dto.setEmail(entity.getEmail());
+        dto.setEmail(isBlank(entity.getEmail()) ? "noemail@mor.et" : entity.getEmail());
         dto.setPhone(entity.getPhone());
-        dto.setHouseNumber(entity.getHouseNumber());
-        dto.setCity(entity.getCity());
-        dto.setRegion(entity.getRegion());
-        dto.setZone(entity.getZone());
-        dto.setKebele(entity.getKebele());
-        dto.setWereda(entity.getWereda());
-        dto.setTin(entity.getTin());
-        dto.setVatNumber(entity.getVatNumber());
-        dto.setIdNumber(entity.getIdNumber());
-        dto.setIdType(entity.getIdType());
-        dto.setCountry(entity.getCountry());
+        dto.setHouseNumber(isBlank(entity.getHouseNumber()) ? "N/A" : entity.getHouseNumber());
+        dto.setCity(isBlank(entity.getCity()) ? "0" : entity.getCity());
+        dto.setRegion(isBlank(entity.getRegion()) ? "0" : entity.getRegion());
+        dto.setZone(isBlank(entity.getZone()) ? null : entity.getZone());
+        dto.setKebele(isBlank(entity.getKebele()) ? null : entity.getKebele());
+        dto.setWereda(isBlank(entity.getWereda()) ? "N/A" : entity.getWereda());
+        dto.setTin(isBlank(entity.getTin()) ? null : entity.getTin());
+        dto.setVatNumber(isBlank(entity.getVatNumber()) ? null : entity.getVatNumber());
+        dto.setIdNumber(isBlank(entity.getIdNumber()) ? "00000000000000" : entity.getIdNumber());
+        dto.setIdType(isBlank(entity.getIdType()) ? "KID" : entity.getIdType());
+        dto.setCountry(isBlank(entity.getCountry()) ? "70" : entity.getCountry());
         return dto;
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.isBlank();
     }
 
     public static ExternalSellerDetailsDTO toExternalSellerDetailsDTO(SellerInfo entity) {
@@ -111,7 +115,10 @@ public class ExternalInvoiceMapper {
     public static ExternalPaymentDetailsDTO toExternalPaymentDetailsDTO(PaymentDetails entity) {
         ExternalPaymentDetailsDTO dto = new ExternalPaymentDetailsDTO();
         dto.setMode(entity.getPaymentMode());
-        dto.setPaymentTerm(entity.getPaymentTerm());
+        // MOR spec uses "IMMIDIATE" (their typo) — map our "IMMEDIATE" to match
+        String term = entity.getPaymentTerm();
+        if ("IMMEDIATE".equalsIgnoreCase(term)) term = "IMMIDIATE";
+        dto.setPaymentTerm(term);
         return dto;
     }
 
@@ -124,13 +131,9 @@ public class ExternalInvoiceMapper {
 
     public static ExternalSourceSystemDTO toExternalSourceSystemDTO(SourceSystem entity) {
         ExternalSourceSystemDTO dto = new ExternalSourceSystemDTO();
-        dto.setCashierName(entity.getCashierName());
-
-        // ✅ Send EXACT invoiceCounter from DB without modification
-     dto.setInvoiceCounter(String.valueOf(entity.getInvoiceCounter())); // ✅ converts Integer → String
-
-
-        dto.setSalesPersonName(entity.getSalesPersonName());
+        dto.setCashierName(isBlank(entity.getCashierName()) ? "Cashier" : entity.getCashierName());
+        dto.setInvoiceCounter(entity.getInvoiceCounter() != null ? entity.getInvoiceCounter() : 1);
+        dto.setSalesPersonName(isBlank(entity.getSalesPersonName()) ? "Sales" : entity.getSalesPersonName());
         dto.setSystemNumber(entity.getSystemNumber());
         dto.setSystemType(entity.getSystemType());
         return dto;

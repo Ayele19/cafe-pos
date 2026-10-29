@@ -30,11 +30,12 @@ public class OrderRequestDTO {
     @JsonProperty("ReferenceDetails")
     private ReferenceDetails referenceDetails;
 
-    @JsonProperty("SourceSystem")
-    private SourceSystem sourceSystem;
-
     @JsonProperty("ValueDetails")
     private ValueDetails valueDetails;
+
+    // Optional: used by admin to select which branch to use
+    @JsonProperty("sourceSystemId")
+    private Long sourceSystemId;
 
     // Getters and Setters
     public String getTransactionType() { return transactionType; }
@@ -61,9 +62,9 @@ public class OrderRequestDTO {
     public ReferenceDetails getReferenceDetails() { return referenceDetails; }
     public void setReferenceDetails(ReferenceDetails referenceDetails) { this.referenceDetails = referenceDetails; }
 
-    public SourceSystem getSourceSystem() { return sourceSystem; }
-    public void setSourceSystem(SourceSystem sourceSystem) { this.sourceSystem = sourceSystem; }
-
     public ValueDetails getValueDetails() { return valueDetails; }
     public void setValueDetails(ValueDetails valueDetails) { this.valueDetails = valueDetails; }
+
+    public Long getSourceSystemId() { return sourceSystemId; }
+    public void setSourceSystemId(Long sourceSystemId) { this.sourceSystemId = sourceSystemId; }
 }

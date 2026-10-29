@@ -1,6 +1,8 @@
 package com.example.cafe_pos.entity_new;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "menu_item")
@@ -13,13 +15,19 @@ public class MenuItem {
     private String name;
     private double price;
     private String category;
-
-    // ✅ UNIT (PCS, CUP, KG...)
     private String unit;
 
-    // ✅ IMAGE PATH
     @Column(name = "image_url")
     private String imageUrl;
+
+    // Empty = available to ALL branches. Non-empty = restricted to listed branches.
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "menu_item_source_system",
+        joinColumns = @JoinColumn(name = "menu_item_id"),
+        inverseJoinColumns = @JoinColumn(name = "source_system_id")
+    )
+    private List<SourceSystem> sourceSystems = new ArrayList<>();
 
     // ===== Getters & Setters =====
 
@@ -40,4 +48,7 @@ public class MenuItem {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public List<SourceSystem> getSourceSystems() { return sourceSystems; }
+    public void setSourceSystems(List<SourceSystem> sourceSystems) { this.sourceSystems = sourceSystems; }
 }

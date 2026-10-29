@@ -1,53 +1,33 @@
 import React from "react";
+import { useAuth } from "../../auth/AuthContext";
+import { PERMISSIONS } from "../../auth/permissions";
+import "../../style/RightSidebar.css";
 
 const RightSidebar = ({ activeSection, setActiveSection }) => {
-  const menuItems = [
-    { id: 'menu', label: 'Sales', icon: '🛒' },
-    { id: 'savedOrders', label: 'Saved Orders', icon: '📋' },
-    { id: 'manageMenu', label: 'Products', icon: '🍽️' },
-    { id: 'manageCustomers', label: 'Customers', icon: '👤' }
-  ];
+  const { hasPermission, hasRole } = useAuth();
+  const isAdmin = hasRole("admin");
+
+  const allItems = [
+    { id: "menu",            label: "Sales",     icon: "🛒", show: hasPermission(PERMISSIONS.ORDER_CREATE) },
+    { id: "savedOrders",     label: "Orders",    icon: "📋", show: hasPermission(PERMISSIONS.ORDER_READ) },
+    { id: "verifyInvoice",   label: "Verify",    icon: "✅", show: hasPermission(PERMISSIONS.ORDER_READ) },
+    { id: "manageCustomers", label: "Customers", icon: "👤", show: hasPermission(PERMISSIONS.CUSTOMER_READ) },
+    { id: "manageMenu",      label: "Products",  icon: "🍽️", show: isAdmin },
+    { id: "manageBranches",  label: "Branches",  icon: "🏢", show: isAdmin },
+    { id: "manageCashiers",  label: "Cashiers",  icon: "👷", show: isAdmin },
+    { id: "manageCompanies", label: "Companies", icon: "🏛️", show: isAdmin },
+    { id: "reports",         label: "Reports",   icon: "📊", show: isAdmin },
+  ].filter(item => item.show);
 
   return (
-    <div style={{
-      width: '220px',
-      backgroundColor: '#1b637591',
-      padding: '20px 10px',
-      height: '100vh',
-      overflow: 'hidden',
-      boxSizing: 'border-box',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
+    <div className="sidebar">
+      <div className="sidebar__logo">CafePOS</div>
 
-      {/* POS Name */}
-      <div style={{
-        textAlign: 'center',
-        fontSize: '22px',
-        fontWeight: 'bold',
-        color: '#ffffff',
-        marginBottom: '20px',
-        letterSpacing: '1px'
-      }}>
-        CafePOS
-      </div>
-
-      {menuItems.map(item => (
+      {allItems.map(item => (
         <div
           key={item.id}
+          className={`sidebar__item${activeSection === item.id ? " sidebar__item--active" : ""}`}
           onClick={() => setActiveSection(item.id)}
-          style={{
-            padding: '12px 16px',
-            margin: '8px 0',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            backgroundColor: activeSection === item.id ? '#1fdf85ff' : 'transparent',
-            color: activeSection === item.id ? 'white' : '#ffffffff',
-            transition: 'all 0.2s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}
         >
           <span>{item.icon}</span>
           <span>{item.label}</span>

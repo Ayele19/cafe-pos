@@ -11,7 +11,7 @@ public class ExternalSourceSystemDTO {
     private String systemType;
 
     @JsonProperty("InvoiceCounter")
-    private String invoiceCounter;
+    private Integer invoiceCounter; // MOR expects integer, not string
 
     @JsonProperty("CashierName")
     private String cashierName;
@@ -19,15 +19,14 @@ public class ExternalSourceSystemDTO {
     @JsonProperty("SalesPersonName")
     private String salesPersonName;
 
-    // Getters & Setters
     public String getSystemNumber() { return systemNumber; }
     public void setSystemNumber(String systemNumber) { this.systemNumber = systemNumber; }
 
     public String getSystemType() { return systemType; }
     public void setSystemType(String systemType) { this.systemType = systemType; }
 
-    public String getInvoiceCounter() { return invoiceCounter; }
-    public void setInvoiceCounter(String invoiceCounter) { this.invoiceCounter = invoiceCounter; }
+    public Integer getInvoiceCounter() { return invoiceCounter; }
+    public void setInvoiceCounter(Integer invoiceCounter) { this.invoiceCounter = invoiceCounter; }
 
     public String getCashierName() { return cashierName; }
     public void setCashierName(String cashierName) { this.cashierName = cashierName; }

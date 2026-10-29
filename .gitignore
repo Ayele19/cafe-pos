@@ -7,6 +7,9 @@ src/main/resources/application.properties
 # Build files
 target/
 
+# Uploaded files (runtime-generated, not source code)
+uploads/
+
 # IDE files
 .classpath
 .project

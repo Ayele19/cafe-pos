@@ -1,16 +1,12 @@
-// OrderSection/ToastMessage.jsx
 import React from "react";
+import "../../../style/ToastMessage.css";
 
 function ToastMessage({ toast }) {
   if (!toast) return null;
-
+  const type = toast.type || "info";
   return (
-    <div className={`p-2 rounded-md text-sm ${
-      toast.type === "error" 
-        ? "bg-red-100 text-red-800 border border-red-200" 
-        : "bg-green-100 text-green-800 border border-green-200"
-    }`}>
-      {toast.text}
+    <div className={`toast-msg toast-msg--${type}`}>
+      {type === "error" ? "✗" : type === "success" ? "✓" : "ℹ"} {toast.text}
     </div>
   );
 }

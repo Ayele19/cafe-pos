@@ -9,6 +9,8 @@ import com.example.cafe_pos.mapper.ExternalInvoiceMapper;
 import com.example.cafe_pos.repository.OrderRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,8 @@ import java.util.Map;
 
 @Service
 public class OrderService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
     private final SourceSystemService sourceSystemService;
@@ -38,13 +42,13 @@ public class OrderService {
     // MAIN METHOD (SEND TO MOR + SAVE)
     // =============================
     @Transactional
-    public Map<String, Object> processOrderAndSaveIfMORSuccess(Order order) {
+    public Map<String, Object> processOrderAndSaveIfMORSuccess(Order order, SourceSystem branch) {
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // 1️⃣ Lock counter row
-            SourceSystem src = sourceSystemService.findByIdForUpdate(1L);
+            // 1️⃣ Lock counter row for the given branch
+            SourceSystem src = sourceSystemService.findByIdForUpdate(branch.getId());
             order.setSourceSystem(src);
 
             // 2️⃣ Generate document number
@@ -79,10 +83,12 @@ public class OrderService {
             ExternalInvoiceDTO dto = ExternalInvoiceMapper.toExternalInvoiceDTO(order);
 
             if (dto.getSourceSystem() != null) {
-                dto.getSourceSystem().setInvoiceCounter(documentNumber);
+                dto.getSourceSystem().setInvoiceCounter(counter);
             }
 
             // 7️⃣ SEND TO MOR API
+            String morPayloadJson = objectMapper.writeValueAsString(dto);
+            log.info("Sending to MOR: {}", morPayloadJson);
             String morRawResponse = taxApiService.sendInvoice(dto);
 
             // 8️⃣ Parse MOR JSON safely (NO GSON!)
@@ -129,12 +135,15 @@ public class OrderService {
             }
 
         } catch (Exception e) {
+            log.error("Exception while processing order", e);
             order.setInvoiceStatus("F");
-            orderRepository.save(order);
-
+            try { orderRepository.save(order); } catch (Exception saveEx) {
+                log.error("Also failed to save failed order", saveEx);
+            }
             response.put("success", false);
             response.put("message", "Exception while sending to MOR");
-            response.put("error", e.getMessage());
+            response.put("error", e.getMessage() != null ? e.getMessage() : e.getClass().getName());
+            response.put("cause", e.getCause() != null ? e.getCause().getMessage() : "none");
         }
 
         return response;
@@ -145,5 +154,9 @@ public class OrderService {
     // =============================
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
+    }
+
+    public List<Order> getOrdersByCashier(String cashierName) {
+        return orderRepository.findByCashierName(cashierName);
     }
 }
